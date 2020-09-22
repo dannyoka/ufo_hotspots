@@ -2,13 +2,12 @@ const express = require("express");
 const app = express();
 const mysql = require("mysql2");
 const PORT = 5000;
-const { Sequelize } = require("sequelize");
-const Sighting = require("./Model.js");
+// const { Sequelize } = require("sequelize");
 
-const sequelize = new Sequelize("mydb", "user", "password", {
-  host: "167.99.151.158",
-  dialect: "mysql",
-});
+// const sequelize = new Sequelize("mydb", "user", "password", {
+//   host: "localhost",
+//   dialect: "mysql",
+// });
 
 app.use(express.json());
 
@@ -16,7 +15,7 @@ const connection = mysql.createConnection({
   host: "localhost",
   user: "root",
   password: "Cvid@019",
-  database: "ig_clone",
+  database: "ufo_sightings",
 });
 const connect = async () => {
   try {
@@ -29,62 +28,51 @@ const connect = async () => {
 
 connect();
 
-// const auth = async () => {
-//   try {
-//     sequelize.authenticate();
-//     console.log("Connection has been established successfully.");
-//   } catch (error) {
-//     console.error("Unable to connect to the database:", error);
-//   }
-// };
-// auth();
+app.set("view engine", "ejs");
 
-connection.query("SELECT 1 + 1 AS solution", (err, rows, fields) => {
-  if (err) {
-    throw err;
-  }
-  console.log(fields);
+app.get("/", async (req, res) => {
+  connection.query(
+    `SELECT * FROM sightings LIMIT 1`,
+    (err, results, fields) => {
+      if (err) throw err;
+      let result = results[0];
+      res.render("home", { lat: result.lat, lng: result.lng });
+      console.log(result);
+    }
+  );
 });
 
-app.get("/add", async (req, res) => {
-  // let {
-  //   sightingDateTime,
-  //   shape,
-  //   durationInSeconds,
-  //   durationInHoursAndMin,
-  //   comments,
-  //   siteLocationLatAndLng,
-  // } = req.body;
-  // let regexpLatAndLng = /[0-9.-]+:[0-9.-]+/;
-  // let regexArr = siteLocationLatAndLng.match(regexpLatAndLng);
-  // let split = regexArr[0].split(":");
-  // let lat = Number(split[0]);
-  // let lng = Number(split[1]);
-  // // let sighting = await Sighting.create({
-  // //   sightingDateTime,
-  // //   shape,
-  // //   durationInSeconds,
-  // //   durationInHoursAndMin,
-  // //   comments,
-  // //   siteLocationLatAndLng,
-  // //   lat,
-  // //   lng,
-  // // });
-  // connection
-  //   .execute
-  //   // `INSERT INTO SIGHTINGS (sightingDateTime, shape, durationInSeconds, durationInHoursAndMin, comments, siteLocationLatAndLng, lat, lng)
-  //   // VALUES (${sightingDateTime}, ${shape}, ${durationInSeconds}, ${durationInHoursAndMin}, ${comments}, ${siteLocationLatAndLng}, ${lat}, ${lng});`
-  //   ();
-  // console.log(req.body);
-  // // console.log(sighting instanceof Sighting);
-  // // console.log("sighting added!");
-  // // res.send(`Recorded sighting: ${sighting}`);
-  const users = connection.query("SELECT * FROM users");
-  res.send(users);
-});
+app.post("/add", async (req, res) => {
+  let {
+    sighting_date_time,
+    shape,
+    duration_in_seconds,
+    duration_in_hours_and_min,
+    comments,
+    site_location_lat_and_lng,
+  } = req.body;
 
+  let regexpLatAndLng = /[0-9.-]+:[0-9.-]+/;
+  let regexArr = site_location_lat_and_lng.match(regexpLatAndLng);
+  let split = regexArr[0].split(":");
+  let lat = Number(split[0]);
+  let lng = Number(split[1]);
+  let sighting = {
+    sighting_date_time,
+    shape,
+    duration_in_seconds,
+    duration_in_hours_and_min,
+    comments,
+    site_location_lat_and_lng,
+    lat,
+    lng,
+  };
+  connection.query("INSERT INTO sightings SET ?", sighting, (err, result) => {
+    if (err) throw err;
+    res.send("Sighting added successfully");
+  });
+});
 app.listen(PORT, () => {
   console.log(`Listening on port ${PORT}`);
 });
-
 // connection.end();
