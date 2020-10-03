@@ -58,6 +58,6 @@ fs.createReadStream(process.argv.slice(2)[0])
       "INSERT INTO sightings (sighting_date_time,shape,duration_in_seconds,duration_in_hours_and_min,comments,site_location_lat_and_lng,lat,lng) VALUES ?";
     connection.query(q, [data], (err, result) => {
       console.log(err);
-      console.log(result);
+      // console.log(result);
     });
   });
