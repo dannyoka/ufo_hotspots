@@ -1,8 +1,8 @@
 const csv = require("csv-parser");
 const fs = require("fs");
-const axios = require("axios");
 const results = [];
 const mysql = require("mysql2");
+const dateConverter = require("./dateConverter");
 
 const connection = mysql.createConnection({
   host: "localhost",
@@ -42,7 +42,7 @@ fs.createReadStream(process.argv.slice(2)[0])
         lng,
       }) => {
         data.push([
-          sighting_date_time,
+          dateConverter(sighting_date_time),
           shape,
           duration_in_seconds,
           duration_in_hours_and_min,
@@ -53,7 +53,6 @@ fs.createReadStream(process.argv.slice(2)[0])
         ]);
       }
     );
-    console.log(data);
 
     const q =
       "INSERT INTO sightings (sighting_date_time,shape,duration_in_seconds,duration_in_hours_and_min,comments,site_location_lat_and_lng,lat,lng) VALUES ?";
@@ -61,27 +60,4 @@ fs.createReadStream(process.argv.slice(2)[0])
       console.log(err);
       console.log(result);
     });
-    //single post request
-
-    //too many requests, I think...
-
-    // newResults.forEach((result) => {
-    //   try {
-    //     axios.post("http://localhost:5000/add", result);
-    //   } catch (error) {
-    //     if (error) throw error;
-    //   }
-    // });
-
-    // newResults.forEach((result) => {
-    //   console.log(result);
-    //   axios.post("localhost:5000/add", result);
-    // });
-    // newResults.forEach((result) => {
-    //   axios.post("locahost:5000", result);
-    // });
-    // [
-    //   { NAME: 'Daffy Duck', AGE: '24' },
-    //   { NAME: 'Bugs Bunny', AGE: '22' }
-    // ]
   });

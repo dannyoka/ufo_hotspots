@@ -161,6 +161,9 @@ class SinglyLinkedList {
     return current;
   }
   shift() {}
+  insert(){
+      
+  }
 }
 
 let myList = new SinglyLinkedList();

@@ -1,6 +1,7 @@
 const express = require("express");
 const app = express();
 const mysql = require("mysql2");
+const dateConverter = require("./dateConverter")
 const PORT = 5000;
 // const { Sequelize } = require("sequelize");
 
@@ -58,7 +59,7 @@ app.post("/add", async (req, res) => {
   let lat = Number(split[0]);
   let lng = Number(split[1]);
   let sighting = {
-    sighting_date_time,
+    sighting_date_time:dateConverter(sighting_date_time),
     shape,
     duration_in_seconds,
     duration_in_hours_and_min,
